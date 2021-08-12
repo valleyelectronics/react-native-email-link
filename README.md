@@ -4,6 +4,10 @@
 [![NPM](https://img.shields.io/npm/dm/react-native-email-link.svg)](https://www.npmjs.com/package/react-native-email-link)
 [![GitHub license](https://img.shields.io/github/license/flexible-agency/react-native-email-link.svg)](https://github.com/flexible-agency/react-native-email-link/blob/master/LICENSE)
 
+## Fixes
+in iOS, canOpenUrl('mailto:foo@bar.com') returns true even though Mail app is not installed. (known bug)
+and in this case, app crashes as it doesn't handle error in openInbox and openComposer methods.
+
 ---
 
 An easy way to open an email app of the user's choice, based on the apps they have installed

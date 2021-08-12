@@ -245,14 +245,18 @@ async function getApp(options) {
  * }} options
  */
 export async function openInbox(options = {}) {
-  const app = await getApp(options);
+  try {
+    const app = await getApp(options);
 
-  if (!app) {
-    return null;
+    if (!app) {
+      return null;
+    }
+
+    await Linking.openURL(prefixes[app]);
+    return { app, title: titles[app] };
+  } catch(e) {
+    return Promise.reject(e);
   }
-
-  await Linking.openURL(prefixes[app]);
-  return { app, title: titles[app] };
 }
 
 /**
@@ -273,24 +277,29 @@ export async function openInbox(options = {}) {
  * }} options
  */
 export async function openComposer(options) {
-  const app = await getApp(options);
+  try {
+    const app = await getApp(options);
 
-  if (!app) {
-    return null;
+    if (!app) {
+      return null;
+    }
+
+    if (options.encodeBody) {
+      options.body = encodeURIComponent(options.body);
+    }
+
+    const params = getUrlParams(app, options);
+    let prefix = prefixes[app];
+
+    if (app === "apple-mail") {
+      // apple mail prefix to compose an email is mailto
+      prefix = "mailto:";
+    }
+
+    await Linking.openURL(`${prefix}${params}`);
+    return { app, title: titles[app] };
+  } catch(e){
+    // ios can't check canOpenUrl for mailto
+    return Promise.reject(e); 
   }
-
-  if (options.encodeBody) {
-    options.body = encodeURIComponent(options.body);
-  }
-
-  const params = getUrlParams(app, options);
-  let prefix = prefixes[app];
-
-  if (app === "apple-mail") {
-    // apple mail prefix to compose an email is mailto
-    prefix = "mailto:";
-  }
-
-  await Linking.openURL(`${prefix}${params}`);
-  return { app, title: titles[app] };
 }
